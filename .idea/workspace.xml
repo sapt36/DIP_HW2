@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="Setup pip install opencv-python(cv2)">
+    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="feat. add requirements.txt for pip install dependencies">
       <change afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/envForExe/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/envForExe/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +37,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.HW2.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
@@ -48,6 +48,35 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\853uj\PyCharmProject\DIP_HW2\envForExe" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="HW2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DIP_HW2" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/envForExe" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/envForExe/HW2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.HW2" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -89,7 +118,23 @@
       <option name="project" value="LOCAL" />
       <updated>1727155765159</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Setup pip install PyQt matplotlib">
+      <option name="closed" value="true" />
+      <created>1727156909478</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1727156909478</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat. add requirements.txt for pip install dependencies">
+      <option name="closed" value="true" />
+      <created>1727156988423</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1727156988423</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -108,6 +153,8 @@
     <MESSAGE value="Setup environment" />
     <MESSAGE value="Setup pipenv for package the .py to .exe" />
     <MESSAGE value="Setup pip install opencv-python(cv2)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Setup pip install opencv-python(cv2)" />
+    <MESSAGE value="Setup pip install PyQt matplotlib" />
+    <MESSAGE value="feat. add requirements.txt for pip install dependencies" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat. add requirements.txt for pip install dependencies" />
   </component>
 </project>
