@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout, QPushBu
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 class ImageProcessingApp(QWidget):
@@ -49,6 +51,16 @@ class ImageProcessingApp(QWidget):
         adjust_button.clicked.connect(self.open_brightness_contrast_dialog)
         layout.addWidget(adjust_button)
 
+        # 調整空間解析度按鈕
+        resize_button = QPushButton('調整空間解析度', self)
+        resize_button.clicked.connect(self.open_resolution_dialog)
+        layout.addWidget(resize_button)
+
+        # 調整灰階級別按鈕
+        grayscale_levels_button = QPushButton('調整灰階級別', self)
+        grayscale_levels_button.clicked.connect(self.open_grayscale_dialog)
+        layout.addWidget(grayscale_levels_button)
+
         # 手動二值化按鈕
         thresh_button = QPushButton('手動二值化圖片', self)
         thresh_button.clicked.connect(self.manual_threshold)
@@ -58,6 +70,11 @@ class ImageProcessingApp(QWidget):
         hist_button = QPushButton('顯示灰階直方圖', self)
         hist_button.clicked.connect(self.show_histogram)
         layout.addWidget(hist_button)
+
+        # 直方圖均衡化保持顏色按鈕
+        hist_equalize_button = QPushButton('直方圖均衡化', self)
+        hist_equalize_button.clicked.connect(self.histogram_equalization_color)
+        layout.addWidget(hist_equalize_button)
 
         self.setLayout(layout)
 
@@ -164,6 +181,46 @@ class ImageProcessingApp(QWidget):
             plt.title('Gray Scale Histogram')
             plt.show()
 
+    # 彈出輸入放大或縮小倍數的對話框
+    def open_resolution_dialog(self):
+        dialog = ResolutionDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            scale_factor = dialog.get_value()
+            self.adjust_resolution(scale_factor)
+
+    # 調整空間解析度函數
+    def adjust_resolution(self, scale_factor):
+        if self.image is not None:
+            resized_image = cv2.resize(self.image, None, fx=scale_factor, fy=scale_factor,
+                                       interpolation=cv2.INTER_LINEAR)
+            self.display_image(resized_image)
+
+    # 彈出輸入灰階級別的對話框
+    def open_grayscale_dialog(self):
+        dialog = GrayscaleDialog(self)
+        if dialog.exec_() == QDialog.Accepted:
+            levels = dialog.get_value()
+            self.adjust_grayscale_levels(levels)
+
+    # 調整灰階級別函數
+    def adjust_grayscale_levels(self, levels):
+        if self.image is not None:
+            gray_img = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+            # 重新分佈灰階級別
+            gray_img = np.floor_divide(gray_img, 256 // levels) * (256 // levels)
+            self.display_image(gray_img)
+
+    # 直方圖均衡化函數（保持顏色）
+    def histogram_equalization_color(self):
+        if self.image is not None:
+            # 將圖像轉換為 YUV 顏色空間
+            yuv_img = cv2.cvtColor(self.image, cv2.COLOR_BGR2YUV)
+            # 對 Y 通道進行直方圖均衡化
+            yuv_img[:, :, 0] = cv2.equalizeHist(yuv_img[:, :, 0])
+            # 將圖像轉換回 BGR
+            equalized_img = cv2.cvtColor(yuv_img, cv2.COLOR_YUV2BGR)
+            self.display_image(equalized_img)
+
 
 class BrightnessContrastDialog(QDialog):
     def __init__(self, parent=None):
@@ -203,6 +260,71 @@ class BrightnessContrastDialog(QDialog):
         except ValueError as e:
             QMessageBox.warning(self, '輸入錯誤', str(e))
             return None, None
+
+
+# ResolutionDialog類，彈出輸入框
+class ResolutionDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('調整空間解析度')
+        self.scale_input = QLineEdit(self)
+        self.scale_input.setPlaceholderText('放大或縮小倍數 (0.1 - 5.0)')
+
+        form_layout = QFormLayout()
+        form_layout.addRow('倍數:', self.scale_input)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+        layout = QVBoxLayout()
+        layout.addLayout(form_layout)
+        layout.addWidget(buttons)
+        self.setLayout(layout)
+
+    def get_value(self):
+        try:
+            scale_factor = float(self.scale_input.text())
+            if not (0.1 <= scale_factor <= 5.0):
+                raise ValueError("倍數必須在 0.1 到 5.0 之間")
+            return scale_factor
+        except ValueError as e:
+            QMessageBox.warning(self, '輸入錯誤', str(e))
+            return None
+
+
+# GrayscaleDialog類，彈出輸入框
+class GrayscaleDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('調整灰階級別')
+        self.levels_input = QLineEdit(self)
+        self.levels_input.setPlaceholderText('灰階級別 (2 - 256)')
+
+        form_layout = QFormLayout()
+        form_layout.addRow('灰階級別:', self.levels_input)
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+        layout = QVBoxLayout()
+        layout.addLayout(form_layout)
+        layout.addWidget(buttons)
+        self.setLayout(layout)
+
+    def get_value(self):
+        try:
+            levels = int(self.levels_input.text())
+            if not (2 <= levels <= 256):
+                raise ValueError("灰階級別必須在 2 到 256 之間")
+            return levels
+        except ValueError as e:
+            QMessageBox.warning(self, '輸入錯誤', str(e))
+            return None
+
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
