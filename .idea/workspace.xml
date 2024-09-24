@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="feat. add .bmp file for testing">
-      <change afterPath="$PROJECT_DIR$/envForExe/Cat.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/envForExe/lena30.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/envForExe/nature.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/envForExe/sample.bmp" afterDir="false" />
+    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="feat. version 1 and add some testing images">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/envForExe/Img_File.bmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/envForExe/HW2.py" beforeDir="false" afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +142,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727158627709</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat. version 1 and add some testing images">
+      <option name="closed" value="true" />
+      <created>1727161300847</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1727161300847</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -169,6 +172,7 @@
     <MESSAGE value="Setup pip install PyQt matplotlib" />
     <MESSAGE value="feat. add requirements.txt for pip install dependencies" />
     <MESSAGE value="feat. add .bmp file for testing" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat. add .bmp file for testing" />
+    <MESSAGE value="feat. version 1 and add some testing images" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat. version 1 and add some testing images" />
   </component>
 </project>
