@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout, QPushButton, QFileDialog, QScrollArea,
                              QSizePolicy, QDialog, QHBoxLayout, QLineEdit, QFormLayout, QDialogButtonBox, QMessageBox)
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QPixmap, QImage, QFont
 from PyQt5.QtCore import Qt
 import matplotlib.pyplot as plt
 import warnings
@@ -11,6 +11,8 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 class ImageProcessingApp(QWidget):
+
+    # 主視窗UI啟動
     def __init__(self):
         super().__init__()
         self.setWindowTitle('HW2 圖像處理軟體')
@@ -18,9 +20,13 @@ class ImageProcessingApp(QWidget):
         self.initUI()
         self.setGeometry(100, 100, 1500, 900)  # 設置視窗尺寸
 
+    # 主視窗UI設置
     def initUI(self):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignCenter)  # 置中所有 UI 元素
+
+        # 設置字體
+        self.setFont(QFont('微軟正黑體', 12, QFont.Bold))
 
         # 創建滾動視窗區域
         self.scroll_area = QScrollArea(self)
@@ -176,21 +182,26 @@ class ImageProcessingApp(QWidget):
     # 調整圖片的亮度與對比度
     def adjust_brightness_contrast(self, brightness, contrast):
         if self.image is not None:
-            adjusted_img = cv2.convertScaleAbs(self.image, alpha=contrast, beta=brightness)
+            # 調整亮度與對比度
+            adjusted_img = np.clip(self.image * contrast + brightness, 0, 255).astype(np.uint8)
             self.display_image(adjusted_img)
 
     # 將灰階圖像轉換為二值化圖像
     def manual_threshold(self):
         if self.image is not None:
-            gray_img = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-            _, binary_img = cv2.threshold(gray_img, 128, 255, cv2.THRESH_BINARY)
+            # 手動將圖片轉為灰階
+            gray_img = self.image.dot([0.299, 0.587, 0.114])
+            # 二值化，閾值為128
+            binary_img = np.where(gray_img > 128, 255, 0).astype(np.uint8)
             self.display_image(binary_img)
 
     # 計算並顯示灰階圖像對應之直方圖
     def show_histogram(self):
         if self.image is not None:
-            gray_img = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-            hist = cv2.calcHist([gray_img], [0], None, [256], [0, 256])
+            # 將圖片轉為灰階
+            gray_img = self.image.dot([0.299, 0.587, 0.114])
+            # 計算直方圖
+            hist, bins = np.histogram(gray_img.flatten(), bins=256, range=[0, 256])
             plt.plot(hist)
             plt.title('Gray Scale Histogram')
             plt.show()
@@ -205,8 +216,16 @@ class ImageProcessingApp(QWidget):
     # 調整空間解析度函數
     def adjust_resolution(self, scale_factor):
         if self.image is not None:
-            resized_image = cv2.resize(self.image, None, fx=scale_factor, fy=scale_factor,
-                                       interpolation=cv2.INTER_LINEAR)
+            # 調整空間解析度
+            h, w = self.image.shape[:2]
+            new_h, new_w = int(h * scale_factor), int(w * scale_factor)
+            resized_image = np.zeros((new_h, new_w, 3), dtype=np.uint8)
+
+            for i in range(new_h):
+                for j in range(new_w):
+                    x, y = int(i / scale_factor), int(j / scale_factor)
+                    resized_image[i, j] = self.image[x, y]
+
             self.display_image(resized_image)
 
     # 彈出輸入灰階級別的對話框
@@ -219,21 +238,44 @@ class ImageProcessingApp(QWidget):
     # 調整灰階級別函數
     def adjust_grayscale_levels(self, levels):
         if self.image is not None:
-            gray_img = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+            # 將圖片轉為灰階
+            gray_img = self.image.dot([0.299, 0.587, 0.114]).astype(np.uint8)
+
             # 重新分佈灰階級別
             gray_img = np.floor_divide(gray_img, 256 // levels) * (256 // levels)
+
+            # 顯示調整後的圖片
             self.display_image(gray_img)
 
     # 直方圖均衡化函數（保持顏色）
     def histogram_equalization_color(self):
         if self.image is not None:
             # 將圖像轉換為 YUV 顏色空間
-            yuv_img = cv2.cvtColor(self.image, cv2.COLOR_BGR2YUV)
-            # 對 Y 通道進行直方圖均衡化
-            yuv_img[:, :, 0] = cv2.equalizeHist(yuv_img[:, :, 0])
-            # 將圖像轉換回 BGR
-            equalized_img = cv2.cvtColor(yuv_img, cv2.COLOR_YUV2BGR)
-            self.display_image(equalized_img)
+            yuv_img = np.zeros_like(self.image, dtype=np.uint8)
+            yuv_img[:, :, 0] = 0.299 * self.image[:, :, 2] + 0.587 * self.image[:, :, 1] + 0.114 * self.image[:, :, 0]
+            yuv_img[:, :, 1:] = self.image[:, :, 1:]
+
+            # 直方圖均衡化 Y 通道
+            y_channel = yuv_img[:, :, 0]
+            hist, bins = np.histogram(y_channel.flatten(), 256, [0, 256])
+            cdf = hist.cumsum()
+            cdf_normalized = cdf * 255 / cdf[-1]
+            y_equalized = np.interp(y_channel.flatten(), bins[:-1], cdf_normalized).reshape(y_channel.shape)
+
+            # 替換 Y 通道
+            yuv_img[:, :, 0] = y_equalized.astype(np.uint8)
+
+            self.display_image(yuv_img.clip(0, 255).astype(np.uint8))
+
+            # 顯示均衡化後的灰階直方圖
+            gray_img = yuv_img.dot([0.299, 0.587, 0.114]).astype(np.uint8)  # 手動將圖片轉為灰階
+            hist, bins = np.histogram(gray_img.flatten(), 256, [0, 256])  # 計算灰階直方圖
+            plt.figure()
+            plt.plot(hist, color='black')
+            plt.title('Histogram of Grayscale Values after Equalization')
+            plt.xlabel('Gray Level')
+            plt.ylabel('Frequency')
+            plt.show()
 
 # 創建一個對話框(彈出視窗)，使用者可以輸入亮度和對比度的數值調整圖片，並點擊確認或取消按鈕。
 class BrightnessContrastDialog(QDialog):

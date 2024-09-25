@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="style. add comment to all function">
+    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="fix. Let scroll_area can be used.&#10;style. edit some comment and text">
       <change afterPath="$PROJECT_DIR$/envForExe/1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/envForExe/HW2.py" beforeDir="false" afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
@@ -43,7 +43,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true"
+    "ignore.virus.scanning.warn.message": "true",
+    "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -51,7 +52,7 @@
       <recent name="C:\Users\853uj\PyCharmProject\DIP_HW2\envForExe" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.1">
+  <component name="RunManager" selected="Python.HW2">
     <configuration name="1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="DIP_HW2" />
       <option name="ENV_FILES" value="" />
@@ -98,8 +99,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.1" />
         <item itemvalue="Python.HW2" />
+        <item itemvalue="Python.1" />
       </list>
     </recent_temporary>
   </component>
@@ -199,7 +200,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727240349959</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="fix. Let scroll_area can be used.&#10;style. edit some comment and text">
+      <option name="closed" value="true" />
+      <created>1727242746606</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1727242746606</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -225,6 +234,7 @@
     <MESSAGE value="feat. version 2 update the gray scale processing function" />
     <MESSAGE value="feat. add function to resize image and its gray scale level / add function for automatic constrast adjustment" />
     <MESSAGE value="style. add comment to all function" />
-    <option name="LAST_COMMIT_MESSAGE" value="style. add comment to all function" />
+    <MESSAGE value="fix. Let scroll_area can be used.&#10;style. edit some comment and text" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix. Let scroll_area can be used.&#10;style. edit some comment and text" />
   </component>
 </project>
