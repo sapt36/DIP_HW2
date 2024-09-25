@@ -16,7 +16,7 @@ class ImageProcessingApp(QWidget):
         self.setWindowTitle('HW2 圖像處理軟體')
         self.image = None
         self.initUI()
-        self.setGeometry(100, 100, 1200, 900)  # 放大視窗尺寸
+        self.setGeometry(100, 100, 1500, 900)  # 設置視窗尺寸
 
     def initUI(self):
         layout = QVBoxLayout()
@@ -26,14 +26,22 @@ class ImageProcessingApp(QWidget):
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
 
+        # 創建一個容器 widget 放入滾動區域
+        container_widget = QWidget(self.scroll_area)
+        self.scroll_area.setWidget(container_widget)
+
+        # 創建佈局來居中顯示圖片
+        container_layout = QVBoxLayout(container_widget)
+        container_layout.setAlignment(Qt.AlignCenter)
+
         # 顯示圖片的 QLabel
         self.image_label = QLabel(self)
         self.image_label.setAlignment(Qt.AlignCenter)  # 置中顯示圖片
         self.image_label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
         self.image_label.setScaledContents(False)
 
-        # 將 QLabel 添加到滾動區域中
-        self.scroll_area.setWidget(self.image_label)
+        # 將 QLabel 添加到容器佈局中
+        container_layout.addWidget(self.image_label)
         layout.addWidget(self.scroll_area)
 
         # 載入圖片按鈕
@@ -66,7 +74,7 @@ class ImageProcessingApp(QWidget):
         grayscale_levels_button.clicked.connect(self.open_grayscale_dialog)
         layout.addWidget(grayscale_levels_button)
 
-        # 調整亮度與對比按鈕
+        # 調整亮度與對比度按鈕
         adjust_button = QPushButton('6. 調整亮度與對比度', self)
         adjust_button.clicked.connect(self.open_brightness_contrast_dialog)
         layout.addWidget(adjust_button)
@@ -98,7 +106,7 @@ class ImageProcessingApp(QWidget):
         # 將圖片轉換為 QPixmap 並顯示，保持圖片原尺寸
         pixmap = QPixmap.fromImage(img)
         self.image_label.setPixmap(pixmap)
-        self.image_label.adjustSize()  # 調整 QLabel 大小以適應圖片原始尺寸
+        self.image_label.setFixedSize(pixmap.size())  # 調整 QLabel 大小以適應圖片原始尺寸
 
     # 轉換圖片為灰階並比較使用兩種公式生成的灰階圖像
     def convert_to_grayscale_and_compare(self):
@@ -274,10 +282,10 @@ class ResolutionDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle('調整圖片大小')
         self.scale_input = QLineEdit(self)
-        self.scale_input.setPlaceholderText('放大或縮小倍數 (0.1 - 5.0)')
+        self.scale_input.setPlaceholderText('倍數 (0.1 - 5.0)')
 
         form_layout = QFormLayout()
-        form_layout.addRow('倍數:', self.scale_input)
+        form_layout.addRow('圖片大小倍數:', self.scale_input)
 
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
         buttons.accepted.connect(self.accept)
@@ -329,7 +337,7 @@ class GrayscaleDialog(QDialog):
             QMessageBox.warning(self, '輸入錯誤', str(e))
             return None
 
-
+# Main Execution
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = ImageProcessingApp()
