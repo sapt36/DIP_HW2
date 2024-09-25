@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="feat. version 2 update the gray scale processing function">
+    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="style. add comment to all function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/envForExe/HW2.py" beforeDir="false" afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,9 +23,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="2mVEZjRHOIHZO6mbjDshk7JaQPM" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -33,16 +34,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.HW2.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.HW2.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\853uj\PyCharmProject\DIP_HW2\envForExe" />
@@ -157,7 +158,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727163181281</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="feat. add function to resize image and its gray scale level / add function for automatic constrast adjustment">
+      <option name="closed" value="true" />
+      <created>1727165173499</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1727165173499</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -181,6 +190,7 @@
     <MESSAGE value="feat. add .bmp file for testing" />
     <MESSAGE value="feat. version 1 and add some testing images" />
     <MESSAGE value="feat. version 2 update the gray scale processing function" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat. version 2 update the gray scale processing function" />
+    <MESSAGE value="feat. add function to resize image and its gray scale level / add function for automatic constrast adjustment" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat. add function to resize image and its gray scale level / add function for automatic constrast adjustment" />
   </component>
 </project>
