@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="fix. Let scroll_area can be used.&#10;style. edit some comment and text">
+    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="fix. we can't use the func. in cv2, so we define our own func.">
       <change afterPath="$PROJECT_DIR$/envForExe/1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/envForExe/HW2.py" beforeDir="false" afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
@@ -35,18 +35,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.1.executor": "Run",
-    "Python.HW2.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "settings.editor.selected.configurable": "preferences.keymap"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.HW2.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\853uj\PyCharmProject\DIP_HW2\envForExe" />
@@ -208,7 +208,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727242746606</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="fix. we can't use the func. in cv2, so we define our own func.">
+      <option name="closed" value="true" />
+      <created>1727270424443</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1727270424444</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -235,6 +243,7 @@
     <MESSAGE value="feat. add function to resize image and its gray scale level / add function for automatic constrast adjustment" />
     <MESSAGE value="style. add comment to all function" />
     <MESSAGE value="fix. Let scroll_area can be used.&#10;style. edit some comment and text" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix. Let scroll_area can be used.&#10;style. edit some comment and text" />
+    <MESSAGE value="fix. we can't use the func. in cv2, so we define our own func." />
+    <option name="LAST_COMMIT_MESSAGE" value="fix. we can't use the func. in cv2, so we define our own func." />
   </component>
 </project>

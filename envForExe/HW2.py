@@ -186,7 +186,7 @@ class ImageProcessingApp(QWidget):
             adjusted_img = np.clip(self.image * contrast + brightness, 0, 255).astype(np.uint8)
             self.display_image(adjusted_img)
 
-    # 將灰階圖像轉換為二值化圖像
+    # 將灰階圖像轉換為二值化圖像 TODO: CH3 func. add ability to change func. parament
     def manual_threshold(self):
         if self.image is not None:
             # 手動將圖片轉為灰階
@@ -213,20 +213,69 @@ class ImageProcessingApp(QWidget):
             scale_factor = dialog.get_value()
             self.adjust_resolution(scale_factor)
 
-    # 調整空間解析度函數
-    def adjust_resolution(self, scale_factor):
+    # 調整空間解析度函數 TODO: user can choose the method
+    def adjust_resolution(self, scale_factor, method='nearest'):
         if self.image is not None:
-            # 調整空間解析度
+            # 取得圖像的原始尺寸
             h, w = self.image.shape[:2]
             new_h, new_w = int(h * scale_factor), int(w * scale_factor)
             resized_image = np.zeros((new_h, new_w, 3), dtype=np.uint8)
 
-            for i in range(new_h):
-                for j in range(new_w):
-                    x, y = int(i / scale_factor), int(j / scale_factor)
-                    resized_image[i, j] = self.image[x, y]
+            # 選擇插值方法
+            if method == 'nearest':
+                resized_image = self.nearest_neighbor_interpolation(new_h, new_w, scale_factor)
+            elif method == 'bilinear':
+                resized_image = self.bilinear_interpolation(new_h, new_w, scale_factor)
 
+            # 顯示調整後的圖像
             self.display_image(resized_image)
+
+    # 1. 最近鄰插值
+    def nearest_neighbor_interpolation(self, new_h, new_w, scale_factor):
+        # 生成新的網格坐標，減少逐像素迴圈，利用向量化操作
+        x_indices = (np.arange(new_h) / scale_factor).astype(int)
+        y_indices = (np.arange(new_w) / scale_factor).astype(int)
+
+        # 限制索引範圍，防止溢出，減少邊界檢查
+        x_indices = np.clip(x_indices, 0, self.image.shape[0] - 1)
+        y_indices = np.clip(y_indices, 0, self.image.shape[1] - 1)
+
+        # 使用 NumPy 批量索引和切片，可以一次性處理整個矩陣，避免了逐像素索引的開銷，提高數據存取效率。
+        resized_image = self.image[x_indices[:, None], y_indices]
+
+        return resized_image
+
+    # 2. 雙線性插值
+    def bilinear_interpolation(self, new_h, new_w, scale_factor):
+        # 生成新的網格坐標
+        x_indices = (np.arange(new_h) / scale_factor)
+        y_indices = (np.arange(new_w) / scale_factor)
+
+        # 找到對應的四個鄰近點
+        x0 = np.floor(x_indices).astype(int)
+        y0 = np.floor(y_indices).astype(int)
+        x1 = np.clip(x0 + 1, 0, self.image.shape[0] - 1)
+        y1 = np.clip(y0 + 1, 0, self.image.shape[1] - 1)
+
+        # 插值係數
+        dx = x_indices - x0
+        dy = y_indices - y0
+
+        # 使用 NumPy 高效取樣
+        resized_image = np.zeros((new_h, new_w, 3), dtype=np.uint8)
+        for c in range(3):
+            # 取出四個鄰近點的值
+            top_left = self.image[x0[:, None], y0, c]
+            top_right = self.image[x0[:, None], y1, c]
+            bottom_left = self.image[x1[:, None], y0, c]
+            bottom_right = self.image[x1[:, None], y1, c]
+
+            # 計算插值
+            top = top_left * (1 - dx)[:, None] + top_right * dx[:, None]
+            bottom = bottom_left * (1 - dx)[:, None] + bottom_right * dx[:, None]
+            resized_image[:, :, c] = (top * (1 - dy) + bottom * dy).astype(np.uint8)
+
+        return resized_image
 
     # 彈出輸入灰階級別的對話框
     def open_grayscale_dialog(self):
@@ -235,7 +284,7 @@ class ImageProcessingApp(QWidget):
             levels = dialog.get_value()
             self.adjust_grayscale_levels(levels)
 
-    # 調整灰階級別函數
+    # 調整灰階級別函數 TODO: CH3 func.
     def adjust_grayscale_levels(self, levels):
         if self.image is not None:
             # 將圖片轉為灰階
@@ -247,28 +296,35 @@ class ImageProcessingApp(QWidget):
             # 顯示調整後的圖片
             self.display_image(gray_img)
 
-    # 直方圖均衡化函數（保持顏色）
+    # 直方圖均衡化函數（對三個通道均衡化）
     def histogram_equalization_color(self):
         if self.image is not None:
-            # 將圖像轉換為 YUV 顏色空間
-            yuv_img = np.zeros_like(self.image, dtype=np.uint8)
-            yuv_img[:, :, 0] = 0.299 * self.image[:, :, 2] + 0.587 * self.image[:, :, 1] + 0.114 * self.image[:, :, 0]
-            yuv_img[:, :, 1:] = self.image[:, :, 1:]
+            # 創建一個空的結果圖像
+            equalized_img = np.zeros_like(self.image)
 
-            # 直方圖均衡化 Y 通道
-            y_channel = yuv_img[:, :, 0]
-            hist, bins = np.histogram(y_channel.flatten(), 256, [0, 256])
-            cdf = hist.cumsum()
-            cdf_normalized = cdf * 255 / cdf[-1]
-            y_equalized = np.interp(y_channel.flatten(), bins[:-1], cdf_normalized).reshape(y_channel.shape)
+            # 對 R, G, B 通道進行均衡化
+            for channel in range(3):
+                channel_data = self.image[:, :, channel]
+                # 計算直方圖
+                hist, bins = np.histogram(channel_data.flatten(), 256, [0, 256])
 
-            # 替換 Y 通道
-            yuv_img[:, :, 0] = y_equalized.astype(np.uint8)
+                # 計算累積分佈函數 (CDF)
+                cdf = hist.cumsum()
+                cdf_normalized = cdf * 255 / cdf[-1] # 正規化到 [0, 255]
 
-            self.display_image(yuv_img.clip(0, 255).astype(np.uint8))
+                # 使用 CDF 進行像素值的映射
+                equalized_channel = np.zeros_like(channel_data)
+                for intensity in range(256):
+                    equalized_channel[channel_data == intensity] = cdf_normalized[intensity]
+
+                # 將均衡化後的通道存入結果圖像
+                equalized_img[:, :, channel] = equalized_channel
+
+            # 顯示均衡化後的圖像
+            self.display_image(equalized_img.astype(np.uint8))
 
             # 顯示均衡化後的灰階直方圖
-            gray_img = yuv_img.dot([0.299, 0.587, 0.114]).astype(np.uint8)  # 手動將圖片轉為灰階
+            gray_img = equalized_img.dot([0.299, 0.587, 0.114]).astype(np.uint8)  # 手動將圖片轉為灰階
             hist, bins = np.histogram(gray_img.flatten(), 256, [0, 256])  # 計算灰階直方圖
             plt.figure()
             plt.plot(hist, color='black')
@@ -276,6 +332,7 @@ class ImageProcessingApp(QWidget):
             plt.xlabel('Gray Level')
             plt.ylabel('Frequency')
             plt.show()
+
 
 # 創建一個對話框(彈出視窗)，使用者可以輸入亮度和對比度的數值調整圖片，並點擊確認或取消按鈕。
 class BrightnessContrastDialog(QDialog):
