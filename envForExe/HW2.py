@@ -6,8 +6,6 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel, QVBoxLayout, QPushBu
 from PyQt5.QtGui import QPixmap, QImage, QFont
 from PyQt5.QtCore import Qt
 import matplotlib.pyplot as plt
-import warnings
-warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 class ImageProcessingApp(QWidget):
@@ -76,7 +74,7 @@ class ImageProcessingApp(QWidget):
         layout.addWidget(resize_button)
 
         # 調整灰階級別按鈕
-        grayscale_levels_button = QPushButton('5-2. 調整灰階級別', self)
+        grayscale_levels_button = QPushButton('5-2. 調整灰階級別 (2 的 1 bit - 8 bits)', self)
         grayscale_levels_button.clicked.connect(self.open_grayscale_dialog)
         layout.addWidget(grayscale_levels_button)
 
@@ -119,6 +117,7 @@ class ImageProcessingApp(QWidget):
         if self.image is not None:
             # 獲取圖像的高、寬以及 RGB 通道數
             h, w, _ = self.image.shape
+            self.image = self.image.astype(np.uint16)  # 使用 uint16 防止 overflow
             # 公式 A: GRAY = (R + G + B) / 3.0
             gray_avg = np.zeros((h, w), dtype=np.uint8)
             for i in range(h):
@@ -151,14 +150,17 @@ class ImageProcessingApp(QWidget):
             gray_weighted_label = QLabel(dialog)
             pixmap_weighted = self.convert_cv_to_pixmap(gray_weighted)
             gray_weighted_label.setPixmap(pixmap_weighted)
-            gray_weighted_label.adjustSize()  # 確保 QLabel 大小適應圖片
+            gray_weighted_label.adjustSize()
             layout.addWidget(gray_weighted_label)
 
             dialog.setLayout(layout)
             dialog.exec_()
 
             # 比較兩張灰階圖像的差異，並顯示到主視窗
-            difference = cv2.absdiff(gray_avg, gray_weighted)
+            difference = np.zeros((h, w), dtype=np.uint8)
+            for i in range(h):
+                for j in range(w):
+                    difference[i, j] = abs(int(gray_avg[i, j]) - int(gray_weighted[i, j]))
             self.display_image(difference)
 
     # 將 OpenCV 圖像轉換為 QPixmap
@@ -182,18 +184,38 @@ class ImageProcessingApp(QWidget):
     # 調整圖片的亮度與對比度
     def adjust_brightness_contrast(self, brightness, contrast):
         if self.image is not None:
-            # 調整亮度與對比度
+            # 使用 np.clip() 限制 np 陣列內元素大小範圍在 0-255 之間
             adjusted_img = np.clip(self.image * contrast + brightness, 0, 255).astype(np.uint8)
             self.display_image(adjusted_img)
 
-    # 將灰階圖像轉換為二值化圖像 TODO: CH3 func. add ability to change func. parament
+    # 將灰階圖像轉換為二值化圖像
     def manual_threshold(self):
         if self.image is not None:
-            # 手動將圖片轉為灰階
-            gray_img = self.image.dot([0.299, 0.587, 0.114])
-            # 二值化，閾值為128
-            binary_img = np.where(gray_img > 128, 255, 0).astype(np.uint8)
-            self.display_image(binary_img)
+            # 創建並顯示閾值彈出視窗
+            dialog = ThresholdDialog(self)
+            if dialog.exec_() == QDialog.Accepted:
+                threshold_value = dialog.get_value()
+                if threshold_value is not None:
+                    # 手動將圖片轉為灰階
+                    gray_img = self.image.dot([0.299, 0.587, 0.114])
+
+                    # 建立與灰階圖像相同大小的空陣列來存放二值化結果
+                    binary_img = [[0 for _ in range(len(gray_img[0]))] for _ in range(len(gray_img))]
+
+                    # 遍歷灰階圖像中的每個像素
+                    for i in range(len(gray_img)):
+                        for j in range(len(gray_img[0])):
+                            # 判斷像素值是否大於閾值
+                            if gray_img[i][j] > threshold_value:
+                                binary_img[i][j] = 255  # 設置為白色
+                            else:
+                                binary_img[i][j] = 0  # 設置為黑色
+
+                    # 將二值化結果轉換為 numpy 陣列，並設置資料型態為 uint8
+                    binary_img = np.array(binary_img, dtype=np.uint8)
+
+                    # 顯示二值化後的圖像
+                    self.display_image(binary_img)
 
     # 計算並顯示灰階圖像對應之直方圖
     def show_histogram(self):
@@ -213,24 +235,19 @@ class ImageProcessingApp(QWidget):
             scale_factor = dialog.get_value()
             self.adjust_resolution(scale_factor)
 
-    # 調整空間解析度函數 TODO: user can choose the method
-    def adjust_resolution(self, scale_factor, method='nearest'):
+    # 調整空間解析度函數
+    def adjust_resolution(self, scale_factor):
         if self.image is not None:
             # 取得圖像的原始尺寸
             h, w = self.image.shape[:2]
             new_h, new_w = int(h * scale_factor), int(w * scale_factor)
-            resized_image = np.zeros((new_h, new_w, 3), dtype=np.uint8)
 
-            # 選擇插值方法
-            if method == 'nearest':
-                resized_image = self.nearest_neighbor_interpolation(new_h, new_w, scale_factor)
-            elif method == 'bilinear':
-                resized_image = self.bilinear_interpolation(new_h, new_w, scale_factor)
+            resized_image = self.nearest_neighbor_interpolation(new_h, new_w, scale_factor)
 
             # 顯示調整後的圖像
             self.display_image(resized_image)
 
-    # 1. 最近鄰插值
+    # 使用最近鄰插值實現放大功能
     def nearest_neighbor_interpolation(self, new_h, new_w, scale_factor):
         # 生成新的網格坐標，減少逐像素迴圈，利用向量化操作
         x_indices = (np.arange(new_h) / scale_factor).astype(int)
@@ -245,38 +262,6 @@ class ImageProcessingApp(QWidget):
 
         return resized_image
 
-    # 2. 雙線性插值
-    def bilinear_interpolation(self, new_h, new_w, scale_factor):
-        # 生成新的網格坐標
-        x_indices = (np.arange(new_h) / scale_factor)
-        y_indices = (np.arange(new_w) / scale_factor)
-
-        # 找到對應的四個鄰近點
-        x0 = np.floor(x_indices).astype(int)
-        y0 = np.floor(y_indices).astype(int)
-        x1 = np.clip(x0 + 1, 0, self.image.shape[0] - 1)
-        y1 = np.clip(y0 + 1, 0, self.image.shape[1] - 1)
-
-        # 插值係數
-        dx = x_indices - x0
-        dy = y_indices - y0
-
-        # 使用 NumPy 高效取樣
-        resized_image = np.zeros((new_h, new_w, 3), dtype=np.uint8)
-        for c in range(3):
-            # 取出四個鄰近點的值
-            top_left = self.image[x0[:, None], y0, c]
-            top_right = self.image[x0[:, None], y1, c]
-            bottom_left = self.image[x1[:, None], y0, c]
-            bottom_right = self.image[x1[:, None], y1, c]
-
-            # 計算插值
-            top = top_left * (1 - dx)[:, None] + top_right * dx[:, None]
-            bottom = bottom_left * (1 - dx)[:, None] + bottom_right * dx[:, None]
-            resized_image[:, :, c] = (top * (1 - dy) + bottom * dy).astype(np.uint8)
-
-        return resized_image
-
     # 彈出輸入灰階級別的對話框
     def open_grayscale_dialog(self):
         dialog = GrayscaleDialog(self)
@@ -284,7 +269,7 @@ class ImageProcessingApp(QWidget):
             levels = dialog.get_value()
             self.adjust_grayscale_levels(levels)
 
-    # 調整灰階級別函數 TODO: CH3 func.
+    # 調整灰階級別函數
     def adjust_grayscale_levels(self, levels):
         if self.image is not None:
             # 將圖片轉為灰階
@@ -296,7 +281,7 @@ class ImageProcessingApp(QWidget):
             # 顯示調整後的圖片
             self.display_image(gray_img)
 
-    # 直方圖均衡化函數（對三個通道均衡化）
+    # 直方圖均衡化函數（對三個通道均衡化）TODO: result will be monochrome of colour? wait
     def histogram_equalization_color(self):
         if self.image is not None:
             # 創建一個空的結果圖像
@@ -310,7 +295,7 @@ class ImageProcessingApp(QWidget):
 
                 # 計算累積分佈函數 (CDF)
                 cdf = hist.cumsum()
-                cdf_normalized = cdf * 255 / cdf[-1] # 正規化到 [0, 255]
+                cdf_normalized = cdf * 255 / cdf[-1]  # 正規化到 [0, 255]
 
                 # 使用 CDF 進行像素值的映射
                 equalized_channel = np.zeros_like(channel_data)
@@ -435,6 +420,41 @@ class GrayscaleDialog(QDialog):
         except ValueError as e:
             QMessageBox.warning(self, '輸入錯誤', str(e))
             return None
+
+
+# 創建一個對話框，可輸入參數調整二值化閥值(2 - 256)
+class ThresholdDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('輸入閾值')
+        self.threshold_input = QLineEdit(self)
+        self.threshold_input.setPlaceholderText('閾值 (0 - 255)')
+
+        # 建立表單佈局
+        form_layout = QFormLayout()
+        form_layout.addRow('二值化閾值:', self.threshold_input)
+
+        # 建立按鈕
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+
+        # 組合佈局
+        layout = QVBoxLayout()
+        layout.addLayout(form_layout)
+        layout.addWidget(buttons)
+        self.setLayout(layout)
+
+    def get_value(self):
+        try:
+            threshold_value = int(self.threshold_input.text())
+            if not (0 <= threshold_value <= 255):
+                raise ValueError("閾值必須在 0 到 255 之間")
+            return threshold_value
+        except ValueError as e:
+            QMessageBox.warning(self, '輸入錯誤', str(e))
+            return None
+
 
 # Main Execution
 if __name__ == '__main__':
