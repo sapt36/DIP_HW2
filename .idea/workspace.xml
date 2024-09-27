@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="feat. update histogram_equalization_color() and adjust_resolution()">
+    <list default="true" id="46e86f35-298e-41c5-8235-76ef69fbd64f" name="Changes" comment="feat. update histogram_equalization_color(self)">
       <change afterPath="$PROJECT_DIR$/envForExe/1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/envForExe/catGray.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/envForExe/dog.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/DIP_HW2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DIP_HW2.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/envForExe/HW2.py" beforeDir="false" afterPath="$PROJECT_DIR$/envForExe/HW2.py" afterDir="false" />
     </list>
@@ -229,7 +226,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727319936269</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="feat. add class ThresholdDialog(QDialog) and update convert_to_grayscale_and_compare(self) / manual_threshold(self)">
+      <option name="closed" value="true" />
+      <created>1727421160624</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1727421160624</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -258,6 +263,7 @@
     <MESSAGE value="fix. Let scroll_area can be used.&#10;style. edit some comment and text" />
     <MESSAGE value="fix. we can't use the func. in cv2, so we define our own func." />
     <MESSAGE value="feat. update histogram_equalization_color() and adjust_resolution()" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat. update histogram_equalization_color() and adjust_resolution()" />
+    <MESSAGE value="feat. add class ThresholdDialog(QDialog) and update convert_to_grayscale_and_compare(self) / manual_threshold(self)" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat. add class ThresholdDialog(QDialog) and update convert_to_grayscale_and_compare(self) / manual_threshold(self)" />
   </component>
 </project>

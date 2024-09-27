@@ -160,7 +160,8 @@ class ImageProcessingApp(QWidget):
             difference = np.zeros((h, w), dtype=np.uint8)
             for i in range(h):
                 for j in range(w):
-                    difference[i, j] = abs(int(gray_avg[i, j]) - int(gray_weighted[i, j]))
+                    diff_value = abs(int(gray_avg[i, j]) - int(gray_weighted[i, j]))
+                    difference[i, j] = np.clip(diff_value, 0, 255)  # 確保在 0-255 範圍內
             self.display_image(difference)
 
     # 將 OpenCV 圖像轉換為 QPixmap
@@ -257,8 +258,11 @@ class ImageProcessingApp(QWidget):
         x_indices = np.clip(x_indices, 0, self.image.shape[0] - 1)
         y_indices = np.clip(y_indices, 0, self.image.shape[1] - 1)
 
-        # 使用 NumPy 批量索引和切片，可以一次性處理整個矩陣，避免了逐像素索引的開銷，提高數據存取效率。
+        # 使用 NumPy 批量索引和切片
         resized_image = self.image[x_indices[:, None], y_indices]
+
+        # 確保結果圖像的資料類型為 uint8，並裁剪範圍
+        resized_image = np.clip(resized_image, 0, 255).astype(np.uint8)
 
         return resized_image
 
@@ -281,7 +285,7 @@ class ImageProcessingApp(QWidget):
             # 顯示調整後的圖片
             self.display_image(gray_img)
 
-    # 直方圖均衡化函數（對三個通道均衡化）TODO: result will be monochrome of colour? wait
+    # 直方圖均衡化函數（對三個通道均衡化）
     def histogram_equalization_color(self):
         if self.image is not None:
             # 創建一個空的結果圖像
