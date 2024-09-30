@@ -115,53 +115,70 @@ class ImageProcessingApp(QWidget):
     # 轉換圖片為灰階並比較使用兩種公式生成的灰階圖像
     def convert_to_grayscale_and_compare(self):
         if self.image is not None:
-            # 獲取圖像的高、寬以及 RGB 通道數
+            # Get the height, width, and RGB channels of the image
             h, w, _ = self.image.shape
-            self.image = self.image.astype(np.uint16)  # 使用 uint16 防止 overflow
-            # 公式 A: GRAY = (R + G + B) / 3.0
+            self.image = self.image.astype(np.uint16)  # Use uint16 to prevent overflow
+
+            # Formula A: GRAY = (R + G + B) / 3.0
             gray_avg = np.zeros((h, w), dtype=np.uint8)
             for i in range(h):
                 for j in range(w):
                     B, G, R = self.image[i, j]
                     gray_avg[i, j] = (R + G + B) / 3
 
-            # 公式 B: GRAY = 0.299*R + 0.587*G + 0.114*B
+            # Formula B: GRAY = 0.299*R + 0.587*G + 0.114*B
             gray_weighted = np.zeros((h, w), dtype=np.uint8)
             for i in range(h):
                 for j in range(w):
                     B, G, R = self.image[i, j]
                     gray_weighted[i, j] = 0.299 * R + 0.587 * G + 0.114 * B
 
-            # 顯示兩張灰階圖片到彈出視窗
+            # Display two grayscale images in a popup window
             dialog = QDialog(self)
             dialog.setWindowTitle('灰階轉換結果')
             dialog.setGeometry(100, 100, 1000, 600)
 
             layout = QHBoxLayout()
 
-            # 將公式 A 的灰階圖像顯示
+            # Display the grayscale image from Formula A
+            gray_avg_layout = QVBoxLayout()
+            label_a = QLabel('Formula A: GRAY = (R + G + B) / 3.0', dialog)
             gray_avg_label = QLabel(dialog)
             pixmap_avg = self.convert_cv_to_pixmap(gray_avg)
             gray_avg_label.setPixmap(pixmap_avg)
-            gray_avg_label.adjustSize()  # 確保 QLabel 大小適應圖片
-            layout.addWidget(gray_avg_label)
+            gray_avg_label.adjustSize()
+            gray_avg_layout.addWidget(label_a)
+            gray_avg_layout.addWidget(gray_avg_label)
+            layout.addLayout(gray_avg_layout)
 
-            # 將公式 B 的灰階圖像顯示
+            # Display the grayscale image from Formula B
+            gray_weighted_layout = QVBoxLayout()
+            label_b = QLabel('Formula B: GRAY = 0.299*R + 0.587*G + 0.114*B', dialog)
             gray_weighted_label = QLabel(dialog)
             pixmap_weighted = self.convert_cv_to_pixmap(gray_weighted)
             gray_weighted_label.setPixmap(pixmap_weighted)
             gray_weighted_label.adjustSize()
-            layout.addWidget(gray_weighted_label)
+            gray_weighted_layout.addWidget(label_b)
+            gray_weighted_layout.addWidget(gray_weighted_label)
+            layout.addLayout(gray_weighted_layout)
 
             dialog.setLayout(layout)
             dialog.exec_()
 
-            # 比較兩張灰階圖像的差異，並顯示到主視窗
+            # Compare the two grayscale images and display the difference in the main window
             difference = np.zeros((h, w), dtype=np.uint8)
             for i in range(h):
                 for j in range(w):
                     diff_value = abs(int(gray_avg[i, j]) - int(gray_weighted[i, j]))
-                    difference[i, j] = np.clip(diff_value, 0, 255)  # 確保在 0-255 範圍內
+                    difference[i, j] = np.clip(diff_value, 0, 255)  # Ensure within the 0-255 range
+            self.display_image(difference)
+
+            # Compare the two grayscale images and display the difference in the main window
+            difference = np.zeros((h, w), dtype=np.uint8)
+            for i in range(h):
+                for j in range(w):
+                    diff_value = abs(int(gray_avg[i, j]) - int(gray_weighted[i, j]))
+                    difference[i, j] = np.clip(diff_value, 0, 255)  # Ensure within the 0-255 range
             self.display_image(difference)
 
     # 將 OpenCV 圖像轉換為 QPixmap
