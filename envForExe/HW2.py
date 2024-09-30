@@ -221,12 +221,15 @@ class ImageProcessingApp(QWidget):
     # 計算並顯示灰階圖像對應之直方圖
     def show_histogram(self):
         if self.image is not None:
-            # 將圖片轉為灰階
+            # Convert the image to grayscale
             gray_img = self.image.dot([0.299, 0.587, 0.114])
-            # 計算直方圖
+            # Calculate histogram
             hist, bins = np.histogram(gray_img.flatten(), bins=256, range=[0, 256])
-            plt.plot(hist)
+            # Plot histogram as a bar plot
+            plt.bar(bins[:-1], hist, width=1, edgecolor='black')
             plt.title('Gray Scale Histogram')
+            plt.xlabel('Pixel Intensity')
+            plt.ylabel('Frequency')
             plt.show()
 
     # 彈出輸入放大或縮小倍數的對話框
@@ -288,35 +291,35 @@ class ImageProcessingApp(QWidget):
     # 直方圖均衡化函數（對三個通道均衡化）
     def histogram_equalization_color(self):
         if self.image is not None:
-            # 創建一個空的結果圖像
+            # Create an empty result image
             equalized_img = np.zeros_like(self.image)
 
-            # 對 R, G, B 通道進行均衡化
+            # Perform equalization for R, G, B channels
             for channel in range(3):
                 channel_data = self.image[:, :, channel]
-                # 計算直方圖
+                # Calculate histogram
                 hist, bins = np.histogram(channel_data.flatten(), 256, [0, 256])
 
-                # 計算累積分佈函數 (CDF)
+                # Calculate cumulative distribution function (CDF)
                 cdf = hist.cumsum()
-                cdf_normalized = cdf * 255 / cdf[-1]  # 正規化到 [0, 255]
+                cdf_normalized = cdf * 255 / cdf[-1]  # Normalize to [0, 255]
 
-                # 使用 CDF 進行像素值的映射
+                # Map pixel values using the CDF
                 equalized_channel = np.zeros_like(channel_data)
                 for intensity in range(256):
                     equalized_channel[channel_data == intensity] = cdf_normalized[intensity]
 
-                # 將均衡化後的通道存入結果圖像
+                # Store the equalized channel in the result image
                 equalized_img[:, :, channel] = equalized_channel
 
-            # 顯示均衡化後的圖像
+            # Display the equalized image
             self.display_image(equalized_img.astype(np.uint8))
 
-            # 顯示均衡化後的灰階直方圖
-            gray_img = equalized_img.dot([0.299, 0.587, 0.114]).astype(np.uint8)  # 手動將圖片轉為灰階
-            hist, bins = np.histogram(gray_img.flatten(), 256, [0, 256])  # 計算灰階直方圖
+            # Display the histogram of the equalized grayscale image
+            gray_img = equalized_img.dot([0.299, 0.587, 0.114]).astype(np.uint8)  # Convert image to grayscale
+            hist, bins = np.histogram(gray_img.flatten(), 256, [0, 256])  # Calculate grayscale histogram
             plt.figure()
-            plt.plot(hist, color='black')
+            plt.bar(bins[:-1], hist, width=1, edgecolor='black', color='gray')
             plt.title('Histogram of Grayscale Values after Equalization')
             plt.xlabel('Gray Level')
             plt.ylabel('Frequency')
